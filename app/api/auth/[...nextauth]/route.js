@@ -1,10 +1,9 @@
+// app/api/auth/[...nextauth]/route.js (or wherever your NextAuth route is)
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma'; // ✅ use the shared Prisma instance
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
 
 export const authOptions = {
   providers: [
@@ -20,6 +19,7 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        // ✅ Use the singleton Prisma instance here
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
