@@ -1,12 +1,10 @@
-// ✅ app/api/auth/[...nextauth]/route.js
-
-// ✅ Prevent static optimization so Vercel won’t try to pre-render this API route
-export const dynamic = 'force-dynamic';
+// app/api/auth/[...nextauth]/route.js
+export const dynamic = 'force-dynamic'; // ✅ Add this to mark as dynamic
 
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { prisma } from '@/lib/prisma'; // ✅ use the shared Prisma instance
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 export const authOptions = {
@@ -23,11 +21,6 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Missing email or password');
-        }
-
-        // ✅ Use the Prisma singleton instance here
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
@@ -49,12 +42,8 @@ export const authOptions = {
     signIn: '/login',
   },
   secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: 'jwt',
-  },
 };
 
-// ✅ Create the handler for NextAuth
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
