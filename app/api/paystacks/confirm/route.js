@@ -1,4 +1,8 @@
 // app/api/paystacks/confirm/route.js
+
+// ✅ Mark this route as dynamic to avoid build-time errors
+export const dynamic = 'force-dynamic';
+
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -17,7 +21,7 @@ export async function POST() {
       data: { isPro: true },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
     console.error('Pro upgrade failed:', err);
     return NextResponse.json({ error: 'Upgrade failed' }, { status: 500 });

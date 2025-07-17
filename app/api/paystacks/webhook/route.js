@@ -1,44 +1,55 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+// app/api/paystacks/webhook/route.js
 
+// ✅ Mark route as dynamic to avoid build-time issues on Vercel
+export const dynamic = 'force-dynamic';
+
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma'; // ✅ use singleton instance
 
 export async function POST(req) {
-  const body = await req.json();
+  try {
+    // ✅ Get raw body for signature verification
+    const body = await req.json();
 
-  const paystackSignature = req.headers.get('x-paystack-signature');
-  const crypto = await import('crypto');
+    const paystackSignature = req.headers.get('x-paystack-signature');
+    const crypto = await import('crypto');
 
-  const hash = crypto
-    .createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
-    .update(JSON.stringify(body))
-    .digest('hex');
+    const computedHash = crypto
+      .createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
+      .update(JSON.stringify(body))
+      .digest('hex');
 
-  // Verify signature
-  if (hash !== paystackSignature) {
-    return NextResponse.json({ status: 'invalid signature' }, { status: 400 });
-  }
+    // ✅ Verify Paystack signature
+    if (computedHash !== paystackSignature) {
+      return NextResponse.json({ status: 'invalid signature' }, { status: 400 });
+    }
 
-  const event = body.event;
+    const event = body.event;
 
-  // Handle successful payment
-  if (event === 'charge.success') {
-    const email = body.data?.customer?.email;
+    if (event === 'charge.success') {
+      const email = body?.data?.customer?.email;
 
-    if (email) {
+      if (!email) {
+        return NextResponse.json({ status: 'missing email' }, { status: 400 });
+      }
+
       try {
-        // Set the user as pro in the database
         await prisma.user.update({
           where: { email },
           data: { isPro: true },
         });
 
         return NextResponse.json({ status: 'success' }, { status: 200 });
-      } catch (error) {
-        console.error('Database error updating user:', error);
+      } catch (dbError) {
+        console.error('Database update error:', dbError);
         return NextResponse.json({ status: 'db error' }, { status: 500 });
       }
     }
-  }
 
-  return NextResponse.json({ status: 'ignored' }, { status: 200 });
+    // ✅ Event is not relevant, acknowledge with 200
+    return NextResponse.json({ status: 'ignored' }, { status: 200 });
+  } catch (err) {
+    console.error('Webhook handling error:', err);
+    return NextResponse.json({ status: 'server error' }, { status: 500 });
+  }
 }
