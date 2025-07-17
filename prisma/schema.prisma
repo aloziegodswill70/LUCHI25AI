@@ -6,22 +6,24 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-model User {
-  id        String   @id @default(cuid())
-  name      String?
-  email     String?  @unique
-  image     String?
-  isPro     Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
 
+model User {
+  id          String       @id @default(cuid())
+  email       String?      @unique
+  createdAt   DateTime     @default(now())
+  image       String?
+  isPro       Boolean      @default(false)
+  name        String?
+  updatedAt   DateTime     @updatedAt
+  password    String?
+  generations Generation[]
+}
 
 model Generation {
   id        String   @id @default(uuid())
-  content   String
-  type      String   // "cv" | "instagram" | "business"
+  type      String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
   userId    String
+  content   String
+  user      User     @relation(fields: [userId], references: [id])
 }
