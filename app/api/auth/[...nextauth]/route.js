@@ -1,11 +1,11 @@
-// ✅ app/api/auth/[...nextauth]/route.js
-export const dynamic = 'force-dynamic'; // fix build issues on Vercel
+// app/api/auth/[...nextauth]/route.js
+export const dynamic = 'force-dynamic'; // 🔥 prevent Next.js from trying to prerender
 
-import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import bcrypt from 'bcryptjs';
+import { prisma } from '@/lib/prisma';
 
 const authOptions = {
   providers: [
@@ -14,14 +14,14 @@ const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'text' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing credentials");
+          throw new Error('Missing credentials');
         }
 
         const user = await prisma.user.findUnique({
@@ -29,12 +29,12 @@ const authOptions = {
         });
 
         if (!user || !user.password) {
-          throw new Error("No user found");
+          throw new Error('No user found');
         }
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) {
-          throw new Error("Invalid password");
+          throw new Error('Invalid password');
         }
 
         return { id: user.id, email: user.email };
@@ -42,11 +42,11 @@ const authOptions = {
     }),
   ],
   pages: {
-    signIn: "/login",
+    signIn: '/login',
   },
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   callbacks: {
     async session({ session, token }) {
