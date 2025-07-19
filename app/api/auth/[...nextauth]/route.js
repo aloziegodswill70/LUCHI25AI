@@ -1,5 +1,5 @@
-// app/api/auth/[...nextauth]/route.js
-export const dynamic = 'force-dynamic'; // ✅ Add this to mark as dynamic
+// ✅ app/api/auth/[...nextauth]/route.js
+export const dynamic = 'force-dynamic'; // Important for Vercel
 
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
@@ -7,13 +7,12 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
-export const authOptions = {
+const handler = NextAuth({
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
-
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -21,6 +20,10 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Missing credentials.');
+        }
+
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
@@ -34,7 +37,10 @@ export const authOptions = {
           throw new Error('Invalid password.');
         }
 
-        return user;
+        return {
+          id: user.id,
+          email: user.email,
+        };
       },
     }),
   ],
@@ -42,8 +48,17 @@ export const authOptions = {
     signIn: '/login',
   },
   secret: process.env.NEXTAUTH_SECRET,
-};
-
-const handler = NextAuth(authOptions);
+  session: {
+    strategy: 'jwt', // recommended in App Router
+  },
+  callbacks: {
+    async session({ session, token }) {
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
+      }
+      return session;
+    },
+  },
+});
 
 export { handler as GET, handler as POST };
