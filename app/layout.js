@@ -24,6 +24,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        {/* ✅ Google AdSense site verification meta tag */}
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-7031040419946505"
+        />
+
         {/* ✅ Google AdSense Script */}
         <Script
           async
@@ -32,7 +38,7 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
         />
 
-        {/* ✅ Adsterra Script for site verification / ad unit */}
+        {/* ✅ Adsterra Script */}
         <Script
           id="adsterra-script"
           strategy="afterInteractive"
