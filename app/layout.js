@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import Script from "next/script"; // ✅ Needed for external scripts
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,20 +32,11 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
         />
 
-        {/* ✅ Adsterra Script */}
+        {/* ✅ Adsterra Script for site verification / ad unit */}
         <Script
           id="adsterra-script"
           strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(){
-                var script = document.createElement('script');
-                script.async = true;
-                script.src = '//plxxxxxxx.example.com/xxxxxx/invoke.js'; // 👉 replace with your real Adsterra script URL
-                document.head.appendChild(script);
-              })();
-            `,
-          }}
+          src="//pl27278341.profitableratecpm.com/7b/2d/fc/7b2dfcf1416e2edc1e02ca98aacfe27b.js"
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
