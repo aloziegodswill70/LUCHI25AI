@@ -38,16 +38,23 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
         />
 
-        {/* ✅ Adsterra Script */}
+        {/* ✅ Adsterra Script (Updated) */}
         <Script
-          id="adsterra-script"
+          async
+          data-cfasync="false"
+          src="//pl27278547.profitableratecpm.com/1f59e71fa26029af801c4ec9fe5a0581/invoke.js"
           strategy="afterInteractive"
-          src="//pl27278341.profitableratecpm.com/7b/2d/fc/7b2dfcf1416e2edc1e02ca98aacfe27b.js"
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Navbar />
+
+        {/* ✅ Your main page content */}
         {children}
+
+        {/* ✅ Adsterra container for the ad unit */}
+        <div id="container-1f59e71fa26029af801c4ec9fe5a0581"></div>
+
         <Footer />
       </body>
     </html>
