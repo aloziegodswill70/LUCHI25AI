@@ -1,47 +1,23 @@
-// ✅ app/api/jobs/route.js
 import { NextResponse } from "next/server";
+
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
-  const query = searchParams.get("q") || "developer";
+  const query = searchParams.get("q") || "";
+  
+  // Build ArbeitNow API URL
+  const apiUrl = `https://www.arbeitnow.com/api/job-board-api?${query ? `search=${encodeURIComponent(query)}` : ""}`;
 
   try {
-    const res = await fetch(
-      `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query)}&num_pages=1`,
-      {
-        headers: {
-          "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
-          "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
-        },
-      }
-    );
-
-    // ✅ Handle quota exceeded
-    if (res.status === 429) {
-      console.warn("Quota exceeded for JSearch API");
-      return NextResponse.json(
-        { error: "⚠️ Daily quota exceeded. Please try again later." },
-        { status: 429 }
-      );
-    }
-
-    // ✅ Handle other non-ok statuses
+    const res = await fetch(apiUrl);
     if (!res.ok) {
-      const text = await res.text();
-      console.error("JSearch API error:", res.status, text);
-      return NextResponse.json(
-        { error: "Failed to load jobs. Please try again later." },
-        { status: res.status }
-      );
+      console.error("ArbeitNow API error:", res.status);
+      return NextResponse.json({ error: "Failed to fetch jobs" }, { status: res.status });
     }
-
     const data = await res.json();
-    return NextResponse.json({ jobs: data.data || [] });
+    return NextResponse.json({ jobs: data.data || [], total: data.data?.length, perPage: data.data?.length });
   } catch (err) {
-    console.error("Jobs fetch error:", err);
-    return NextResponse.json(
-      { error: "Failed to load jobs. Please check your connection." },
-      { status: 500 }
-    );
+    console.error("Error fetching from ArbeitNow:", err);
+    return NextResponse.json({ error: "Failed to load jobs" }, { status: 500 });
   }
 }

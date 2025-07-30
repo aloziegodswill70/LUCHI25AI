@@ -13,6 +13,7 @@ module.exports = {
         luchiGreen: "#00aa00",
         luchiYellow: "#ffcc00",
         luchiWhite: "#ffffff",
+         gold: '#FFD700', 
       },
     },
   },

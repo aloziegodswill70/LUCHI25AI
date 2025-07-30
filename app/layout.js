@@ -18,6 +18,9 @@ export const metadata = {
   title: "Luchi25AI",
   description:
     "Generate your CV and Application letter instantly, also get news for jobs and scholarships.",
+    icons: {
+    icon: "/images/luchi.png",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -45,6 +48,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+    
         <Navbar />
 
         {/* ✅ Main content */}

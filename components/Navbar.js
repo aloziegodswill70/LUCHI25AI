@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; // you can use lucide-react icons
+import Image from "next/image";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -18,6 +19,13 @@ export default function Navbar() {
   return (
     <nav className="w-full bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
+        <Image
+            src="/images/luchi.png"
+            alt="Luchi25 Logo"
+            width={50}
+            height={50}
+            priority
+          />
         {/* Logo */}
         <h1 className="text-2xl font-extrabold text-red-600">
           <Link href="/" className="hover:opacity-80">
